@@ -1,0 +1,37 @@
+Requires: A three-species complex with branch lengths and a measurement of the number of shared/unique incompatibilities between them.
+I wouldn't try to use this with fewer than three different measures of shared/unique incompatibilities.
+
+Load the <maxlikeEPL.py> module and its dependencies to access the functions to calculate maximum-likelihood and parameter estimates under
+different models of hybrid incompatibility accumulation. There are 5 models for which likelihoods and parameter estimates can be calculated:
+	linear          maxprob_n1(K_1, K_2, obs)
+	quadratic       maxprob_n2(K_1, K_2, obs)
+	cubic           maxprob_n3(K_1, K_2, obs)
+	quad+cubic      maxprob_n2n3(K_1, K_2, obs)
+	p_a != p_d      maxprob_n2_dadd(K_1, K_2, obs)
+	
+The linear function models non-epistatic accumulation; the quadratic is the classic two-locus snowball; the cubic models a three-locus
+snowball; quad+cubic allows for both two- and three-locus incompatibilities with independent parameters for their respective probabilities
+p_2 and p_3; the p_a != p_d model allows derived-derived incompatibilities to accumulate at a different rate than derived-ancestral
+incompatibilities.
+
+Each of these functions take three inputs:
+	K_1, the inner branch length, or the relative time from the initial divergence of the species complex to the time of the most recent
+	     divergence.
+	K_2, the relative time since the most recent divergence and now.
+	obs, a NumPy array of incompatibility measures arranged as ([ I_ab, I_ac, I_bc, I_sharedC, I_sharedB, I_sharedA ])
+
+For the obs parameter, the first three elements are the total number of incompatibilities between species A and B, A and C, and B and C. The
+last three are the number of shared incompatibilities between species pairs AC/BC, AB/BC, and AB/AC respectively. See Wang et al. 2013 for
+details on tree structure and naming.
+
+If any observations are missing, they can be replaced with a -1, e.g. ([ 20, 15, -1, 8, -1, -1 ]) if you only have incompatibility measures
+from species pairs AB and AC.
+
+The output for each of these functions is a tuple where the first element is the maximum-likelihood value and the second element is an
+estimate of the parameters under their respective models.
+
+The maximum-likelihood search is currently optimized for values of K_1 and K_2 on the order of 10^5. Values departing orders of magnitude
+from this may result in failure to converge due to floating point inaccuracies.
+
+In addition to the parameters listed above, the linear function has a lower_eps and upper_eps parameter that default to 1e-4 and 1. The
+epsilon parameter is in place to avoid singularity of the covariance matrix that can occur for certain parameter values.
