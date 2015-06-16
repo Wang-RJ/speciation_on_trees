@@ -1,5 +1,4 @@
 from numpy import *
-import warnings
 
 def Ex_n1(p_1, K_1, K_2):
     return array([2*p_1*K_2,          # ab
